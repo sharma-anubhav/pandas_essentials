@@ -1,0 +1,85 @@
+# READ
+df = pd.read_csv('Data/survey_results_public.csv', index_col = "ResponseId")
+df = pd.DataFrame(data) #data can be a dict
+
+#SET PARAMETERS FOR PANDAS
+pd.set_option('display.max_columns', 79)
+pd.set_option('display.max_rows', 79)
+
+# ATTRIBUTES AND METHODS
+df.columns
+df.shape
+people_df.index
+df.info()
+
+# ACCESS METHODS
+df.loc[]
+df.iloc[]
+df[]
+
+# INDEXING
+df.set_index("email", inplace = True)
+df.reset_index(inplace = True)
+df.sort_index(ascending = False, inplace = True)
+
+# FILTERING
+**** If you have to make changes and not just see the data use df.loc[filter] as df[filter] returns a copy.
+filter = df['ConvertedCompYearly'] > 215232
+df[filter]
+df[~filter]
+df.loc[filter, "ConvertedCompYearly"] # filter essesntially applies on rows, so we can also select columns in the .loc
+
+countries = ["Germany", "India", "Israel", "Canada"]
+filter = df["Country"].isin(["Germany", "India", "Israel", "Canada"])
+filter = df["Country"].isin(countries)
+filter = df["LanguageHaveWorkedWith"].str.contains("SQL", na = False)
+df[filter]
+
+# Modification of COLUMN NAME
+df.columns = [x.lower() for x in df.columns]
+df.rename(columns = {'first_name': 'First'}, inplace = True )
+
+# ROW DATA MODIFY
+df.loc[0, "First"] = "Anubhavs"
+df.loc[0, ["First", "last_name"]] = ["Anubhavs", "sharmaa"]
+df.loc[0] = ["Anubhavs", "sh", "anubhavs@gmail.com"]
+df.at[0, "First"] = "Anubhavs" # Use for single value modifications
+
+# Modifying conditionally with filters.
+filter = df["last_name"] == "sharma"
+df.loc[filter, "first_name"] = "Amritsar"
+
+filter  = people_df["age"] > 2
+people_df.loc[filter, "age"] += 10
+*************** if we had used df[filter]["last_name"] = "Amritsar" it would not work. Keep in mind that df[filter] returns a temp copy and should only be used for visualization and filtering to see the data. df.loc[filter] should be used if you need to make changes
+
+# row/ Col data modify
+df.loc[0] = df.loc[0].str.upper()
+df["lname"] = df["lname"].str.upper()
+
+#apply acts differently for series and df objects. for series it acts on every object. For df it acts on every series of columns/rows inside
+df["lname"] = df["lname"].apply(lambda x: x.lower())
+print(df["lname"].apply(len))
+df.apply(lambda x: x.min(), axis = 'rows')
+
+# applymap acts on individual element of df unlike apply who acted on the series of columns/rows as a whole and gave us number of elements
+df.applymap(len)
+df.applymap(str.lower)
+
+#map, replace only works on series and takes in dict to substitute
+df["fname"].map({"Anubhav": "Anu"})
+df["fname"].replace({"Anubhav": "Anu"}) # replace just substututes the dict values and others remain same. But in map others become nan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
