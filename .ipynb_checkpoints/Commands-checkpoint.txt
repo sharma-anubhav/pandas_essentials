@@ -11,6 +11,14 @@ df.columns
 df.shape
 people_df.index
 df.info()
+df.describe()
+df["Col"].count()
+df.count()
+df["col"].value_counts() -> gives count of each class of entry in col. lIke yes, no
+df["col"].value_counts(normalize = True) -> this gives percentage instead of count
+df["Col"].mean()
+df["col"].median()
+
 
 # ACCESS METHODS
 df.loc[]
@@ -35,7 +43,7 @@ filter = df["Country"].isin(countries)
 filter = df["LanguageHaveWorkedWith"].str.contains("SQL", na = False)
 df[filter]
 
-# Modification of COLUMN NAME
+# COLUMN NAME MODIFICATION
 df.columns = [x.lower() for x in df.columns]
 df.rename(columns = {'first_name': 'First'}, inplace = True )
 
@@ -45,7 +53,7 @@ df.loc[0, ["First", "last_name"]] = ["Anubhavs", "sharmaa"]
 df.loc[0] = ["Anubhavs", "sh", "anubhavs@gmail.com"]
 df.at[0, "First"] = "Anubhavs" # Use for single value modifications
 
-# Modifying conditionally with filters.
+# MODIFY DATA WITH FILTERS.
 filter = df["last_name"] == "sharma"
 df.loc[filter, "first_name"] = "Amritsar"
 
@@ -53,22 +61,89 @@ filter  = people_df["age"] > 2
 people_df.loc[filter, "age"] += 10
 *************** if we had used df[filter]["last_name"] = "Amritsar" it would not work. Keep in mind that df[filter] returns a temp copy and should only be used for visualization and filtering to see the data. df.loc[filter] should be used if you need to make changes
 
-# row/ Col data modify
+# row/Col DATA MODIFY
 df.loc[0] = df.loc[0].str.upper()
 df["lname"] = df["lname"].str.upper()
 
-#apply acts differently for series and df objects. for series it acts on every object. For df it acts on every series of columns/rows inside
+# APPLY METHOD 
+# acts differently for series and df objects. for series it acts on every object. For df it acts on every series of columns/rows inside
 df["lname"] = df["lname"].apply(lambda x: x.lower())
 print(df["lname"].apply(len))
 df.apply(lambda x: x.min(), axis = 'rows')
 
-# applymap acts on individual element of df unlike apply who acted on the series of columns/rows as a whole and gave us number of elements
+# APPLYMAP 
+# acts on individual element of df unlike apply who acted on the series of columns/rows as a whole and gave us number of elements
 df.applymap(len)
 df.applymap(str.lower)
 
-#map, replace only works on series and takes in dict to substitute
-df["fname"].map({"Anubhav": "Anu"})
+# MAP, REPLACE 
+# only works on series and takes in dict to substitute
+df["fname"].map({"Anubhav": "Anu"}) # we will mostly wany to use REPLACE and not MAP in df
 df["fname"].replace({"Anubhav": "Anu"}) # replace just substututes the dict values and others remain same. But in map others become nan
+
+
+# Adding new columns/rows and CONCAT col
+df["full_name"] = df["fname"] + " " + df["lname"]
+
+# DROP COLUMNS
+people_df.drop(columns = ["new_Age3"], inplace = True)
+people_df
+
+# SPLIT and EXPAND Column
+# 2 new col are added from existing
+df[["new_firstName", "new_lastName"]] = df["full_name"].str.split(" ", expand = True)
+
+# ADD ROWS, CONCAT DF
+# things to keep in mind. adding row needs a index. but if you dont want to give one, set ignore_index = false and then add.
+# .APPEND METHOD WAS DEPRICATED FROM LATEST PANDAS. WE DONT USE IT NOW
+# .loc
+# data that you dont give is set to NaN
+df.loc[3] = {"fname" : "Anupama"}
+# .CONCAT
+# the columns that are not there are set to NaN
+df = pd.concat([df, df2], ignore_index = True)
+
+
+# DELETE ROWS
+people_df.drop(index = 4, inplace = True)
+
+# DELETE ROWS with FILTERS
+filter = df["lname"] == "Sharma"
+indexes = df[filter].index
+df.drop(index = indexes, inplace = True)
+
+# SORTING
+df.sort_values(by = ["lname", "fname"], ascending = [True, False], inplace = True)
+df["age"].nlargest(2)
+df["age"].nsmallest(2)
+df.nsmallest(2, "age")
+
+
+# GROUPING AND AGGREGATION
+country_groups = df.groupby(["Country"]) # can pass a list if nesting grouping
+for name, df in groups:
+    print(name, " ", df["ConvertedCompYearly"].mean())   #iterating over the group object
+## group object operations
+country_groups["Employment"].value_counts()
+country_groups["Employment"].value_counts().loc["India"]
+country_groups["ConvertedCompYearly"].mean() 
+country_groups["ConvertedCompYearly"].mean().loc["India"] 
+#### VIMP here we did not use directly .str.contains as it is a group object. we need to apply the lambda fun to every df inside)
+country_groups["LanguageHaveWorkedWith"].apply(lambda x: x.str.contains("Python").sum())
+#### Filter equivalent of this is
+df.loc[df["Country"] == "India", "LanguageHaveWorkedWith"].str.contains("Python").sum()
+## single object operations
+country_groups.get_group("India")
+
+
+
+
+
+
+
+
+
+
 
 
 
